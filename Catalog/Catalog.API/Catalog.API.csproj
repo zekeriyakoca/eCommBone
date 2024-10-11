@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <UserSecretsId>aspnet-Catalog.API-81438AF4-F22D-438D-9D77-DEC346AEF3B1</UserSecretsId>
+        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.0-rc.1.24452.1" NoWarn="NU1605" />
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="9.0.0-rc.1.24452.1" NoWarn="NU1605" />
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.0-rc.1.24452.1" />
+        <PackageReference Include="Microsoft.Identity.Web" Version="3.0.0" />
+        <PackageReference Include="Microsoft.Identity.Web.DownstreamApi" Version="3.0.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Include="..\..\.dockerignore">
+        <Link>.dockerignore</Link>
+      </Content>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Behaviours" />
+      <Folder Include="Commands" />
+      <Folder Include="Controllers" />
+      <Folder Include="DomainEvent" />
+      <Folder Include="Extensions" />
+      <Folder Include="IntegrationEvent" />
+      <Folder Include="Queries" />
+      <Folder Include="Validations" />
+    </ItemGroup>
+
+</Project>
