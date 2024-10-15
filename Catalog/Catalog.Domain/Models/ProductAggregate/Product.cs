@@ -26,7 +26,6 @@ public class Product : Entity, IAggregateRoot
     public ProductTags Tags { get; set; }
     
     public int SoldCount { get; set; }
-    
 
     // Quantity in stock
     public int AvailableStock { get; set; }
@@ -41,6 +40,27 @@ public class Product : Entity, IAggregateRoot
     /// True if item is on reorder
     /// </summary>
     public bool OnReorder { get; set; }
+    
+    public ICollection<Variant> Variants { get; set; } = new List<Variant>();
+
+    public ICollection<ProductAttribute> ProductAttributes { get; set; } = new List<ProductAttribute>();
+
+    public ICollection<Image> Images { get; set; } = new List<Image>();
+    
+    // Related products (as children)
+    public virtual ICollection<ProductRelation> ChildRelations { get; set; } = new List<ProductRelation>();
+
+    // Related products (as parents)
+    public virtual ICollection<ProductRelation> ParentRelations { get; set; } = new List<ProductRelation>();
+
+    // Products that are related to this product, either as parent or child
+    public IEnumerable<Product> RelatedProducts 
+    {
+        get
+        {
+            return ChildRelations.Select(r => r.ChildProduct).Distinct();
+        }
+    }
 
     public Product() { }
     

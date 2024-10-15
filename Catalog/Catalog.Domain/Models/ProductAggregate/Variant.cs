@@ -12,6 +12,6 @@ public class Variant : Entity
     
     public int ProductId { get; set; }
     
-    public IEnumerable<Image> Images { get; set; }
-    public IEnumerable<ProductAttribute> Attributes { get; set; }
+    public ICollection<Image> Images { get; set; }
+    public ICollection<ProductAttribute> Attributes { get; set; }
 }
