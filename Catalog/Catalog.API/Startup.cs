@@ -1,3 +1,4 @@
+using Catalog.Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.Resource;
@@ -14,6 +15,7 @@ public class Startup
     // This method gets called by the runtime. Use this method to add services to the container.
     public void ConfigureServices(IServiceCollection services)
     {
+        services.AddDbContext<CatalogDbContext>(options => { });
         // Add services to the container.
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddMicrosoftIdentityWebApi(Configuration.GetSection("AzureAdB2C"));
@@ -46,7 +48,7 @@ public class Startup
             {
                 endpoints.MapOpenApi();
             }
-            
+
             endpoints.MapGet("/weatherforecast", (HttpContext httpContext) =>
                 {
                     httpContext.VerifyUserHasAnyAcceptedScope(scopeRequiredByApi);

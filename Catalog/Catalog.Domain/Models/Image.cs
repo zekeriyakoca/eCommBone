@@ -1,6 +1,6 @@
 namespace Catalog.Domain.Models;
 
-public class Image
+public class Image : Entity
 {
     public string Name { get; set; }
     public string Thumb { get; set; }

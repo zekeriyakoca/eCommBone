@@ -39,4 +39,9 @@
       <Folder Include="Validations" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\Catalog.Domain\Catalog.Domain.csproj" />
+      <ProjectReference Include="..\Catalog.Infrastructure\Catalog.Infrastructure.csproj" />
+    </ItemGroup>
+
 </Project>
