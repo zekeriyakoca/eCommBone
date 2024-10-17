@@ -14,10 +14,12 @@ public class Product : Entity, IAggregateRoot
     public string Description { get; set; }
     
     public string Owner { get; set; }
+    
+    public string Brand { get; set; }
 
     public decimal Price { get; set; }
     
-    public int CustomVariantId { get; set; }
+    public int? CustomVariantId { get; set; }
     public CustomVariant CustomVariant { get; set; }
     
     public int CategoryId { get; set; }
@@ -42,9 +44,7 @@ public class Product : Entity, IAggregateRoot
     public bool OnReorder { get; set; }
     
     public ICollection<Variant> Variants { get; set; } = new List<Variant>();
-
-    public ICollection<ProductAttribute> ProductAttributes { get; set; } = new List<ProductAttribute>();
-
+    
     public ICollection<Image> Images { get; set; } = new List<Image>();
     
     // Related products (as children)

@@ -24,11 +24,20 @@ public class Startup
 
         // Learn more about configuring OpenAPI
         services.AddOpenApi();
+        
+        services.AddEndpointsApiExplorer();
+        services.AddSwaggerGen();
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
+        if (env.IsDevelopment())
+        {
+            app.UseSwagger();
+            app.UseSwaggerUI();
+        }
+        
         app.UseHttpsRedirection();
 
         var scopeRequiredByApi = Configuration["AzureAd:Scopes"] ?? "";
@@ -38,7 +47,6 @@ public class Startup
         };
 
         app.UseRouting();
-
         app.UseAuthentication();
         app.UseAuthorization();
 

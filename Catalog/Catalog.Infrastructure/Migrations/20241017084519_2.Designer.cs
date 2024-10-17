@@ -4,6 +4,7 @@ using Catalog.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Catalog.Infrastructure.Migrations
 {
     [DbContext(typeof(CatalogDbContext))]
-    partial class CatalogDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241017084519_2")]
+    partial class _2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -219,7 +222,7 @@ namespace Catalog.Infrastructure.Migrations
                     b.Property<int>("CategoryId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("CustomVariantId")
+                    b.Property<int>("CustomVariantId")
                         .HasColumnType("int");
 
                     b.Property<string>("Description")
@@ -432,7 +435,9 @@ namespace Catalog.Infrastructure.Migrations
 
                     b.HasOne("Catalog.Domain.Models.CustomVariant", "CustomVariant")
                         .WithMany()
-                        .HasForeignKey("CustomVariantId");
+                        .HasForeignKey("CustomVariantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Catalog.Domain.Models.Product", null)
                         .WithMany("RelatedProducts")
