@@ -11,8 +11,6 @@ public class Category : Entity, IAggregateRoot
     [ForeignKey("ParentCategoryId")]
     public Category ParentCategory { get; set; }
     public int? ParentCategoryId { get; set; }
-
-    public ICollection<Product> Products { get; set; } = new List<Product>();
-
+    
     public ICollection<Image> Images { get; set; } = new List<Image>();
 }

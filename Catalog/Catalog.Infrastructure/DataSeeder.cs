@@ -7,9 +7,30 @@ public static class DataSeeder
 {
     public static async Task Seed(CatalogDbContext context)
     {
-        if(context.Categories.Any()) return;
-        
-        var product1 = new Product()
+        if (context.Categories.Any()) return;
+
+        var category = new Category()
+        {
+            Name = "Electronics",
+            Description = "Electronic Items",
+            Slug = "electronics"
+        };
+
+        context.Categories.Add(category);
+
+        var sampleProduct = GetSampleProduct(category);
+
+        context.Add(sampleProduct);
+        context.Add(CloneProductWith(sampleProduct, "Alienware m16 R3 gaminglaptop", "Alienware m16 R3 gaminglaptop", "Alienware m16 R3 gaminglaptop", 1200));
+        context.Add(CloneProductWith(sampleProduct, "Alienware m14 R3 gaminglaptop", "Alienware m14 R3 gaminglaptop", "Alienware m14 R3 gaminglaptop", 1033));
+        context.Add(CloneProductWith(sampleProduct, "Alienware m15 R3 gaminglaptop", "Alienware m15 R3 gaminglaptop", "Alienware m15 R3 gaminglaptop", 1140));
+
+        await context.SaveChangesAsync();
+    }
+
+    private static Product GetSampleProduct(Category category)
+    {
+        return new Product()
         {
             Name = "Alienware m18 R2 gaminglaptop",
             Description = "Alienware m18 R2 gaminglaptop",
@@ -19,6 +40,7 @@ public static class DataSeeder
             RestockThreshold = 10,
             MaxStockThreshold = 100,
             OnReorder = false,
+            Category = category,
             Variants = new List<Variant>()
             {
                 new Variant()
@@ -61,7 +83,7 @@ public static class DataSeeder
                 {
                     Order = 1,
                     Name = "m18 R2",
-                    Original = 
+                    Original =
                         "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/alienware-notebooks/alienware-m18-mlk/media-gallery/hd/laptop-alienware-m18-r2-hd-perkey-intel-bk-gallery-2.psd?fmt=png-alpha&pscan=auto&scl=1&hei=402&wid=522&qlt=100,1&resMode=sharp2&size=522,402&chrss=full",
                     Thumb =
                         "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/alienware-notebooks/alienware-m18-mlk/media-gallery/hd/laptop-alienware-m18-r2-hd-perkey-intel-bk-gallery-2.psd?fmt=png-alpha&pscan=auto&scl=1&hei=402&wid=522&qlt=100,1&resMode=sharp2&size=522,402&chrss=full",
@@ -77,30 +99,12 @@ public static class DataSeeder
             Brand = "DELL",
             Tags = ProductTags.Featured,
         };
-        
-        var category = new Category()
-        {
-            Name = "Electronics",
-            Description = "Electronic Items",
-            Slug = "electronics",
-            Products = new List<Product>()
-            {
-                product1,
-                CloneProductWith(product1, "Alienware m16 R3 gaminglaptop", "Alienware m16 R3 gaminglaptop", "Alienware m16 R3 gaminglaptop", 1200),
-                CloneProductWith(product1, "Alienware m14 R3 gaminglaptop", "Alienware m14 R3 gaminglaptop", "Alienware m14 R3 gaminglaptop", 1033),
-                CloneProductWith(product1, "Alienware m15 R3 gaminglaptop", "Alienware m15 R3 gaminglaptop", "Alienware m15 R3 gaminglaptop", 1140),
-            }
-        };
-        
-        context.Categories.Add(category);
-        
-        await context.SaveChangesAsync();
     }
 
     private static Product CloneProductWith(Product refProduct, string name, string desc, string title, int price)
     {
         var newProduct = JsonSerializer.Deserialize<Product>(JsonSerializer.Serialize(refProduct));
-        if(newProduct == null) throw new Exception("Failed to clone product");
+        if (newProduct == null) throw new Exception("Failed to clone product");
         newProduct.Name = name;
         newProduct.Description = desc;
         newProduct.Title = title;

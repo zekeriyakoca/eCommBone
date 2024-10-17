@@ -8,10 +8,10 @@ public class CatalogDomainException : Exception, IDomainException
 
     public CatalogDomainException(string message) : base(message)
     {
+        
     }
 
     public CatalogDomainException(string message, Exception innerException) : base(message, innerException)
     {
     }
-    
 }
