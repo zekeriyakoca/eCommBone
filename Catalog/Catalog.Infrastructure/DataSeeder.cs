@@ -9,12 +9,7 @@ public static class DataSeeder
     {
         if (context.Categories.Any()) return;
 
-        var category = new Category()
-        {
-            Name = "Electronics",
-            Description = "Electronic Items",
-            Slug = "electronics"
-        };
+        var category = new Category("Electronics", "Electronic Items");
 
         context.Categories.Add(category);
 

@@ -35,6 +35,7 @@
     <ItemGroup>
       <Folder Include="Behaviours" />
       <Folder Include="DomainEvent" />
+      <Folder Include="Dtos" />
       <Folder Include="IntegrationEvent" />
       <Folder Include="Validations" />
     </ItemGroup>

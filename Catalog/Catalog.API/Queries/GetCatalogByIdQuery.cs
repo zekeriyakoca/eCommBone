@@ -18,6 +18,9 @@ public class GetCategoryByIdQueryHandler : IRequestHandler<GetCategoryByIdQuery,
 
     public async Task<Category?> Handle(GetCategoryByIdQuery request, CancellationToken cancellationToken)
     {
-        return await _context.Categories.FindAsync(request.Id, cancellationToken);
+        return await _context.Categories
+            .Include(x=>x.ParentCategory.ParentCategory)
+            .Where(x=> x.Id == request.Id)
+            .FirstOrDefaultAsync(cancellationToken);
     }
 }
