@@ -1,5 +1,5 @@
 using System.ComponentModel.DataAnnotations;
-using Catalog.API.DomainEvent;
+using Catalog.Domain.Events;
 using Catalog.Domain.Exceptions;
 using Catalog.Domain.Models;
 using Catalog.Infrastructure;
