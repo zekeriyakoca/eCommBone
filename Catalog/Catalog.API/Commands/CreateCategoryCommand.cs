@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Catalog.API.DomainEvent;
 using Catalog.Domain.Exceptions;
 using Catalog.Domain.Models;
 using Catalog.Infrastructure;
@@ -30,7 +31,8 @@ public class CreateCategoryCommandHandler : IRequestHandler<CreateCategoryComman
         }
 
         var category = new Category(request.Name, request.Description, request.ParentCategoryId);
-
+        category.AddDomainEvent(new CategoryCreatedDomainEvent());
+        
         _context.Categories.Add(category);
         await _context.SaveChangesAsync(cancellationToken);
 
