@@ -1,5 +1,9 @@
+using Catalog.API.Behaviours;
 using Catalog.API.Middlewares;
+using Catalog.API.Validations;
 using Catalog.Infrastructure;
+using FluentValidation;
+using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Identity.Web;
@@ -18,17 +22,20 @@ public class Startup
     public void ConfigureServices(IServiceCollection services)
     {
         services.AddDbContext<CatalogDbContext>(options => { });
-        // Add services to the container.
+        
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddMicrosoftIdentityWebApi(Configuration.GetSection("AzureAdB2C"));
-
         services.AddAuthorization();
 
         services.AddOpenApiServices();
-
+        
+        // MediatR
         services.AddMediatR(cfg => {
             cfg.RegisterServicesFromAssembly(typeof(Program).Assembly);
-        });
+        }); 
+        services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>)); 
+        
+        services.AddValidatorsFromAssemblyContaining<CreateCategoryCommandValidator>(); // FluentValidation
 
         services.AddApplicationServices();
     }
