@@ -8,6 +8,6 @@ public class ProductAttribute : Entity
     
     public int VariantId { get; set; }
     
-    public int GroupId { get; set; }
-    public AttributeGroup Group { get; set; }
+    public int? GroupId { get; set; }
+    public AttributeGroup? Group { get; set; }
 }

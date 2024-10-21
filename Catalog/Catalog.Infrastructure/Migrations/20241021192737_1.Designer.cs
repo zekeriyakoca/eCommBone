@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Catalog.Infrastructure.Migrations
 {
     [DbContext(typeof(CatalogDbContext))]
-    [Migration("20241017084519_2")]
-    partial class _2
+    [Migration("20241021192737_1")]
+    partial class _1
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -222,7 +222,7 @@ namespace Catalog.Infrastructure.Migrations
                     b.Property<int>("CategoryId")
                         .HasColumnType("int");
 
-                    b.Property<int>("CustomVariantId")
+                    b.Property<int?>("CustomVariantId")
                         .HasColumnType("int");
 
                     b.Property<string>("Description")
@@ -243,9 +243,6 @@ namespace Catalog.Infrastructure.Migrations
                     b.Property<string>("Owner")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal>("Price")
-                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int?>("ProductId")
                         .HasColumnType("int");
@@ -290,7 +287,7 @@ namespace Catalog.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("GroupId")
+                    b.Property<int?>("GroupId")
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
@@ -358,6 +355,9 @@ namespace Catalog.Infrastructure.Migrations
                     b.Property<int>("Order")
                         .HasColumnType("int");
 
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
 
@@ -394,7 +394,7 @@ namespace Catalog.Infrastructure.Migrations
                     b.HasOne("Catalog.Domain.Models.Category", "ParentCategory")
                         .WithMany()
                         .HasForeignKey("ParentCategoryId")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("ParentCategory");
                 });
@@ -414,30 +414,31 @@ namespace Catalog.Infrastructure.Migrations
                 {
                     b.HasOne("Catalog.Domain.Models.Category", null)
                         .WithMany("Images")
-                        .HasForeignKey("CategoryId");
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Catalog.Domain.Models.Product", null)
                         .WithMany("Images")
-                        .HasForeignKey("ProductId");
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Catalog.Domain.Models.Variant", null)
                         .WithMany("Images")
-                        .HasForeignKey("VariantId");
+                        .HasForeignKey("VariantId")
+                        .OnDelete(DeleteBehavior.Restrict);
                 });
 
             modelBuilder.Entity("Catalog.Domain.Models.Product", b =>
                 {
                     b.HasOne("Catalog.Domain.Models.Category", "Category")
-                        .WithMany("Products")
+                        .WithMany()
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Catalog.Domain.Models.CustomVariant", "CustomVariant")
                         .WithMany()
-                        .HasForeignKey("CustomVariantId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CustomVariantId");
 
                     b.HasOne("Catalog.Domain.Models.Product", null)
                         .WithMany("RelatedProducts")
@@ -452,9 +453,7 @@ namespace Catalog.Infrastructure.Migrations
                 {
                     b.HasOne("Catalog.Domain.Models.AttributeGroup", "Group")
                         .WithMany()
-                        .HasForeignKey("GroupId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("GroupId");
 
                     b.HasOne("Catalog.Domain.Models.Variant", null)
                         .WithMany("Attributes")
@@ -496,8 +495,6 @@ namespace Catalog.Infrastructure.Migrations
             modelBuilder.Entity("Catalog.Domain.Models.Category", b =>
                 {
                     b.Navigation("Images");
-
-                    b.Navigation("Products");
                 });
 
             modelBuilder.Entity("Catalog.Domain.Models.Product", b =>

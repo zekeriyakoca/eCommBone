@@ -17,5 +17,14 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
             .WithOne(pr => pr.ParentProduct)
             .HasForeignKey(pr => pr.ParentProductId)
             .OnDelete(DeleteBehavior.Restrict);
+        
+        builder.HasMany(p => p.Images)
+            .WithOne()
+            .HasForeignKey(i => i.ProductId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder
+            .Navigation(p => p.Variants)
+            .UsePropertyAccessMode(PropertyAccessMode.Field); // Tell EF to use the backing field
     }
 }

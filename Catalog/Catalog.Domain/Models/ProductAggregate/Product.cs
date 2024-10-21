@@ -1,32 +1,30 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 using Catalog.Domain.Exceptions;
+using Microsoft.EntityFrameworkCore;
 
 namespace Catalog.Domain.Models;
 
 public class Product : Entity, IAggregateRoot
 {
-    [Required]
-    [MaxLength(50)]
-    public string Name { get; set; }
+    [Required] [MaxLength(50)] public string Name { get; set; }
 
     public string Title { get; set; }
 
     public string Description { get; set; }
-    
+
     public string Owner { get; set; }
-    
+
     public string Brand { get; set; }
 
-    public decimal Price { get; set; }
-    
     public int? CustomVariantId { get; set; }
-    public CustomVariant CustomVariant { get; set; }
-    
+    public CustomVariant? CustomVariant { get; set; }
+
     public int CategoryId { get; set; }
     public Category Category { get; set; }
-    
+
     public ProductTags Tags { get; set; }
-    
+
     public int SoldCount { get; set; }
 
     // Quantity in stock
@@ -34,7 +32,7 @@ public class Product : Entity, IAggregateRoot
 
     // Available stock at which we should reorder
     public int RestockThreshold { get; set; }
-    
+
     // Maximum number of units that can be in-stock at any time (due to physicial/logistical constraints in warehouses)
     public int MaxStockThreshold { get; set; }
 
@@ -42,11 +40,33 @@ public class Product : Entity, IAggregateRoot
     /// True if item is on reorder
     /// </summary>
     public bool OnReorder { get; set; }
+
+    private List<Variant> _variants = new();
     
-    public ICollection<Variant> Variants { get; set; } = new List<Variant>();
-    
+    [JsonIgnore]
+    [BackingField("_variants")]
+    public IReadOnlyCollection<Variant> Variants => _variants.AsReadOnly();
+
+    public void AddVariant(Variant variant)
+    {
+        if (_variants.Any(v => v.Name == variant.Name))
+        {
+            throw new CatalogDomainException($"Variant with name {variant.Name} already exists.");
+        }
+
+        _variants.Add(variant);
+    }
+
+    public void RemoveVariant(int variantId)
+    {
+        var variantIndex = _variants.FindIndex(p => p.Id == variantId);
+        if (variantIndex > 0)
+            _variants.RemoveAt(variantIndex);
+    }
+
+
     public ICollection<Image> Images { get; set; } = new List<Image>();
-    
+
     // Related products (as children)
     public virtual ICollection<ProductRelation> ChildRelations { get; set; } = new List<ProductRelation>();
 
@@ -54,16 +74,29 @@ public class Product : Entity, IAggregateRoot
     public virtual ICollection<ProductRelation> ParentRelations { get; set; } = new List<ProductRelation>();
 
     // Products that are related to this product, either as parent or child
-    public IEnumerable<Product> RelatedProducts 
+    public IEnumerable<Product> RelatedProducts
     {
-        get
-        {
-            return ChildRelations.Select(r => r.ChildProduct).Distinct();
-        }
+        get { return ChildRelations.Select(r => r.ChildProduct).Distinct(); }
     }
 
-    public Product() { }
-    
+    private Product()
+    {
+    }
+
+    public Product(string name, string description, string title, string owner, string brand, int categoryId, ProductTags tags, decimal price, int stockQuantity,
+        int stockThreshold, decimal discountAmount, decimal discountRate, List<string> imageUrls)
+    {
+        Name = name;
+        Description = description;
+        Title = title;
+        Owner = owner;
+        Brand = brand;
+        CategoryId = categoryId;
+        Tags = tags;
+        AddVariant(new Variant(name, description, stockQuantity, stockThreshold, price, discountRate, discountAmount));
+        imageUrls.ForEach(x => Images.Add(new Image { Original = x, Name = "Product image"}));
+    }
+
     /// <summary>
     /// Decrements the quantity of a particular item in inventory and ensures the restockThreshold hasn't
     /// been breached. If so, a RestockRequest is generated in CheckThreshold. 

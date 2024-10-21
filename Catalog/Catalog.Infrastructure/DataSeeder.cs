@@ -1,5 +1,6 @@
 using System.Text.Json;
 using Catalog.Domain.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Catalog.Infrastructure;
 
@@ -7,103 +8,85 @@ public static class DataSeeder
 {
     public static async Task Seed(CatalogDbContext context)
     {
-        if (context.Categories.Any()) return;
+        try
+        {
+            await context.Database.BeginTransactionAsync();
+            
+            await context.Database.EnsureCreatedAsync();
 
-        var category = new Category("Electronics", "Electronic Items");
+            // context.Categories.ExecuteDelete();
+            // context.Products.ExecuteDelete();
+            // context.CustomVariants.ExecuteDelete();
 
-        context.Categories.Add(category);
+            if (context.Categories.Any()) return;
 
-        var sampleProduct = GetSampleProduct(category);
+            var category = new Category("Electronics", "Electronic Items");
 
-        context.Add(sampleProduct);
-        context.Add(CloneProductWith(sampleProduct, "Alienware m16 R3 gaminglaptop", "Alienware m16 R3 gaminglaptop", "Alienware m16 R3 gaminglaptop", 1200));
-        context.Add(CloneProductWith(sampleProduct, "Alienware m14 R3 gaminglaptop", "Alienware m14 R3 gaminglaptop", "Alienware m14 R3 gaminglaptop", 1033));
-        context.Add(CloneProductWith(sampleProduct, "Alienware m15 R3 gaminglaptop", "Alienware m15 R3 gaminglaptop", "Alienware m15 R3 gaminglaptop", 1140));
+            context.Categories.Add(category);
 
-        await context.SaveChangesAsync();
+            await context.SaveChangesAsync();
+        
+            var sampleProduct = GetSampleProduct(category);
+
+            context.Add(sampleProduct);
+            // context.Add(CloneProductWith(sampleProduct, "Alienware m16 R3 gaminglaptop", "Alienware m16 R3 gaminglaptop", "Alienware m16 R3 gaminglaptop", 1200));
+            // context.Add(CloneProductWith(sampleProduct, "Alienware m14 R3 gaminglaptop", "Alienware m14 R3 gaminglaptop", "Alienware m14 R3 gaminglaptop", 1033));
+            // context.Add(CloneProductWith(sampleProduct, "Alienware m15 R3 gaminglaptop", "Alienware m15 R3 gaminglaptop", "Alienware m15 R3 gaminglaptop", 1140));
+
+            await context.SaveChangesAsync();
+            
+            await context.Database.CommitTransactionAsync();
+        }
+        catch (Exception e)
+        {
+            await context.Database.RollbackTransactionAsync();
+            throw;
+        }
     }
 
     private static Product GetSampleProduct(Category category)
     {
-        return new Product()
+        var product = new Product("Alienware m18 R2 gaminglaptop", "Alienware m18 R2 gaminglaptop", "Alienware m18 R2 gaminglaptop", "DELL Technologies", "DELL", category.Id,
+            ProductTags.Featured, 1420, 100, 10, 0, 12,
+            new List<string>()
+            {
+                "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/alienware-notebooks/alienware-m18-mlk/media-gallery/hd/laptop-alienware-m18-r2-hd-perkey-intel-bk-gallery-2.psd?fmt=png-alpha&pscan=auto&scl=1&hei=402&wid=522&qlt=100,1&resMode=sharp2&size=522,402&chrss=full"
+            });
+
+        product.Variants.First().Attributes.Add(new ProductAttribute()
         {
-            Name = "Alienware m18 R2 gaminglaptop",
-            Description = "Alienware m18 R2 gaminglaptop",
-            Title = "Alienware m18 R2 gaminglaptop",
-            Price = 1420,
-            AvailableStock = 100,
-            RestockThreshold = 10,
-            MaxStockThreshold = 100,
-            OnReorder = false,
-            Category = category,
-            Variants = new List<Variant>()
+            Name = "Intel Core i7",
+            Description = "Intel Core i7",
+            CustomValue = "Intel Core i7",
+            Group = new AttributeGroup()
             {
-                new Variant()
-                {
-                    Order = 0,
-                    DiscountAmount = 0,
-                    DiscountRate = 12,
-                    Name = "Intel Core i7__RTX 4060",
-                    Description = "Intel Core i7 / RTX 4060",
-                    Attributes = new List<ProductAttribute>()
-                    {
-                        new ProductAttribute()
-                        {
-                            Name = "Intel Core i7",
-                            Description = "Intel Core i7",
-                            CustomValue = "Intel Core i7",
-                            Group = new AttributeGroup()
-                            {
-                                Name = "CPU",
-                                Description = "CPU"
-                            }
-                        },
-                        new ProductAttribute()
-                        {
-                            Name = "GeForce RTX 4060",
-                            Description = "NVIDIA GeForce RTX 4060",
-                            CustomValue = "NVIDIA GeForce RTX 4060",
-                            Group = new AttributeGroup()
-                            {
-                                Name = "GPU",
-                                Description = "Graphics Processing Unit"
-                            }
-                        }
-                    }
-                }
-            },
-            Images = new List<Image>()
+                Name = "CPU",
+                Description = "CPU"
+            }
+        });
+        product.Variants.First().Attributes.Add(
+            new ProductAttribute()
             {
-                new Image()
+                Name = "GeForce RTX 4060",
+                Description = "NVIDIA GeForce RTX 4060",
+                CustomValue = "NVIDIA GeForce RTX 4060",
+                Group = new AttributeGroup()
                 {
-                    Order = 1,
-                    Name = "m18 R2",
-                    Original =
-                        "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/alienware-notebooks/alienware-m18-mlk/media-gallery/hd/laptop-alienware-m18-r2-hd-perkey-intel-bk-gallery-2.psd?fmt=png-alpha&pscan=auto&scl=1&hei=402&wid=522&qlt=100,1&resMode=sharp2&size=522,402&chrss=full",
-                    Thumb =
-                        "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/alienware-notebooks/alienware-m18-mlk/media-gallery/hd/laptop-alienware-m18-r2-hd-perkey-intel-bk-gallery-2.psd?fmt=png-alpha&pscan=auto&scl=1&hei=402&wid=522&qlt=100,1&resMode=sharp2&size=522,402&chrss=full",
-                    Small =
-                        "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/alienware-notebooks/alienware-m18-mlk/media-gallery/hd/laptop-alienware-m18-r2-hd-perkey-intel-bk-gallery-2.psd?fmt=png-alpha&pscan=auto&scl=1&hei=402&wid=522&qlt=100,1&resMode=sharp2&size=522,402&chrss=full",
-                    Medium =
-                        "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/alienware-notebooks/alienware-m18-mlk/media-gallery/hd/laptop-alienware-m18-r2-hd-perkey-intel-bk-gallery-2.psd?fmt=png-alpha&pscan=auto&scl=1&hei=402&wid=522&qlt=100,1&resMode=sharp2&size=522,402&chrss=full",
-                    Large =
-                        "https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/alienware-notebooks/alienware-m18-mlk/media-gallery/hd/laptop-alienware-m18-r2-hd-perkey-intel-bk-gallery-2.psd?fmt=png-alpha&pscan=auto&scl=1&hei=402&wid=522&qlt=100,1&resMode=sharp2&size=522,402&chrss=full",
+                    Name = "GPU",
+                    Description = "Graphics Processing Unit"
                 }
-            },
-            Owner = "DELL Technologies",
-            Brand = "DELL",
-            Tags = ProductTags.Featured,
-        };
+            });
+        return product;
     }
 
     private static Product CloneProductWith(Product refProduct, string name, string desc, string title, int price)
     {
-        var newProduct = JsonSerializer.Deserialize<Product>(JsonSerializer.Serialize(refProduct));
+        var newProduct = JsonSerializer.Deserialize<Product>(JsonSerializer.Serialize(refProduct, new JsonSerializerOptions() { IncludeFields = true }), new JsonSerializerOptions() { IncludeFields = false });
         if (newProduct == null) throw new Exception("Failed to clone product");
         newProduct.Name = name;
         newProduct.Description = desc;
         newProduct.Title = title;
-        newProduct.Price = price;
+        newProduct.Variants.First().Price = price;
         return newProduct;
     }
 }

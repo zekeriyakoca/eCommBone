@@ -1,8 +1,6 @@
 using Catalog.API.Commands;
 using Catalog.API.Queries;
 using MediatR;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Catalog.API.Controllers;
@@ -62,7 +60,7 @@ public class CategoryController : BaseController
     [ProducesResponseType(404)]
     public async Task<IActionResult> DeleteAsync([FromRoute] int id)
     {
-        var isSuccess = await _sender.Send(new DeleteCatalogQuery(id));
+        var isSuccess = await _sender.Send(new DeleteCategoryCommand(id));
         if (!isSuccess)
         {
             return NotFound();
