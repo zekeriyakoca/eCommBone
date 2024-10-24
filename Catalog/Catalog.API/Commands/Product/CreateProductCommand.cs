@@ -15,7 +15,7 @@ public record CreateProductCommand(
     string Owner,
     string Brand,
     [Range(1, int.MaxValue)][Required] int CategoryId,
-    ProductTags Tags,
+    ProductTags? Tags,
     // CustomVariant? CustomVariant, // Temporarily disabled
     List<string> Images,
     [Required] decimal Price,

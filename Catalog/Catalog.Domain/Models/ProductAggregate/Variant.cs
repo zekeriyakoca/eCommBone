@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations.Schema;
+using Catalog.Domain.Utils;
 
 namespace Catalog.Domain.Models;
 
@@ -37,4 +38,9 @@ public class Variant : Entity
 
     public ICollection<Image> Images { get; set; }
     public ICollection<ProductAttribute> Attributes { get; set; }
+
+    public decimal GetCalculatedPrice()
+    {
+        return PriceManager.CalculatePrice(Price, DiscountRate, DiscountAmount);
+    }
 }

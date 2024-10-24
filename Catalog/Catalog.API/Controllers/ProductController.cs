@@ -29,4 +29,13 @@ public class ProductController : BaseController
 
         return Ok(product);
     }
+    
+    [HttpPost("search")]
+    [ProducesResponseType(200)]
+    public async Task<ActionResult> SearchCatalogItems([FromBody] SearchProductQuery searchRequestDto)
+    {
+        var productList = await _sender.Send(searchRequestDto);
+
+        return Ok(productList);
+    }
 }

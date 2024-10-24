@@ -1,3 +1,5 @@
+using Catalog.Domain.Utils;
+
 namespace Catalog.Domain.Models;
 
 public class CustomVariant : Entity
@@ -8,5 +10,10 @@ public class CustomVariant : Entity
     
     public int PricePolicyId { get; set; }
     public CustomPricePolicy PricePolicy { get; set; }
+    
+    public decimal GetCalculatedPrice()
+    {
+        return PriceManager.CalculatePrice(PricePolicy.Price, DiscountRate, DiscountAmount);
+    }
 
 }

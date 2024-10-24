@@ -23,7 +23,7 @@ public class Product : Entity, IAggregateRoot
     public int CategoryId { get; set; }
     public Category Category { get; set; }
 
-    public ProductTags Tags { get; set; }
+    public ProductTags? Tags { get; set; }
 
     public int SoldCount { get; set; }
 
@@ -42,7 +42,7 @@ public class Product : Entity, IAggregateRoot
     public bool OnReorder { get; set; }
 
     private List<Variant> _variants = new();
-    
+
     [JsonIgnore]
     [BackingField("_variants")]
     public IReadOnlyCollection<Variant> Variants => _variants.AsReadOnly();
@@ -83,7 +83,7 @@ public class Product : Entity, IAggregateRoot
     {
     }
 
-    public Product(string name, string description, string title, string owner, string brand, int categoryId, ProductTags tags, decimal price, int stockQuantity,
+    public Product(string name, string description, string title, string owner, string brand, int categoryId, ProductTags? tags, decimal price, int stockQuantity,
         int stockThreshold, decimal discountAmount, decimal discountRate, List<string> imageUrls)
     {
         Name = name;
@@ -94,7 +94,7 @@ public class Product : Entity, IAggregateRoot
         CategoryId = categoryId;
         Tags = tags;
         AddVariant(new Variant(name, description, stockQuantity, stockThreshold, price, discountRate, discountAmount));
-        imageUrls.ForEach(x => Images.Add(new Image { Original = x, Name = "Product image"}));
+        imageUrls.ForEach(x => Images.Add(new Image { Original = x, Name = "Product image" }));
     }
 
     /// <summary>
@@ -152,5 +152,15 @@ public class Product : Entity, IAggregateRoot
         this.OnReorder = false;
 
         return this.AvailableStock - original;
+    }
+
+    public virtual decimal GetLowestPrice()
+    {
+        if (CustomVariant != null)
+        {
+            return CustomVariant.GetCalculatedPrice();
+        }
+
+        return Variants.Min(x => x.GetCalculatedPrice());
     }
 }
