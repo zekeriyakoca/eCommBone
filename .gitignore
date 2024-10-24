@@ -20,3 +20,5 @@ Catalog/Catalog.Domain/obj/
 Pricing.API/bin/
 
 Pricing.API/obj/
+
+Pricing.API/appsettings.Development.json
