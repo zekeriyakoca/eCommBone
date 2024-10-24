@@ -1,3 +1,5 @@
+using Catalog.Infrastructure;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container
@@ -13,5 +15,11 @@ var app = builder.Build();
 var env = app.Environment;
 
 startup.Configure(app, env);
+
+if (env.IsDevelopment())
+{
+    using var scope = app.Services.CreateScope();
+    DataSeeder.Seed(scope.ServiceProvider.GetRequiredService<CatalogDbContext>()).Wait();
+}
 
 app.Run();

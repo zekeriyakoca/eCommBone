@@ -6,3 +6,13 @@
 Catalog/Catalog.API/bin/
 
 Catalog/Catalog.API/obj/
+
+Catalog/Catalog.API/appsettings.Development.json
+
+Catalog/Catalog.Infrastructure/bin/
+
+Catalog/Catalog.Infrastructure/obj/
+
+Catalog/Catalog.Domain/bin/
+
+Catalog/Catalog.Domain/obj/

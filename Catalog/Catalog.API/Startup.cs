@@ -1,4 +1,11 @@
+using Catalog.API.Behaviours;
+using Catalog.API.Middlewares;
+using Catalog.API.Validations;
+using Catalog.Infrastructure;
+using FluentValidation;
+using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.Resource;
 
@@ -14,31 +21,47 @@ public class Startup
     // This method gets called by the runtime. Use this method to add services to the container.
     public void ConfigureServices(IServiceCollection services)
     {
-        // Add services to the container.
+        services.AddDbContext<CatalogDbContext>(options => { });
+        
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddMicrosoftIdentityWebApi(Configuration.GetSection("AzureAdB2C"));
-
         services.AddAuthorization();
 
-        // Learn more about configuring OpenAPI
-        services.AddOpenApi();
+        services.AddOpenApiServices();
+        
+        // MediatR
+        services.AddMediatR(cfg => {
+            cfg.RegisterServicesFromAssembly(typeof(Program).Assembly);
+        }); 
+        services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>)); 
+        
+        services.AddValidatorsFromAssemblyContaining<CreateCategoryCommandValidator>(); // FluentValidation
+
+        services.AddApplicationServices();
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
+        if (env.IsDevelopment())
+        {
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                // Default to v1.0 in Swagger UI
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Catalog API v1.0");
+            });
+        }
+
         app.UseHttpsRedirection();
 
         var scopeRequiredByApi = Configuration["AzureAd:Scopes"] ?? "";
-        var summaries = new[]
-        {
-            "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-        };
 
         app.UseRouting();
+        // app.UseAuthentication();
+        // app.UseAuthorization();
 
-        app.UseAuthentication();
-        app.UseAuthorization();
+        app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
 
         app.UseEndpoints(endpoints =>
         {
@@ -46,29 +69,8 @@ public class Startup
             {
                 endpoints.MapOpenApi();
             }
-            
-            endpoints.MapGet("/weatherforecast", (HttpContext httpContext) =>
-                {
-                    httpContext.VerifyUserHasAnyAcceptedScope(scopeRequiredByApi);
 
-                    var forecast = Enumerable.Range(1, 5).Select(index =>
-                            new WeatherForecast
-                            (
-                                DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-                                Random.Shared.Next(-20, 55),
-                                summaries[Random.Shared.Next(summaries.Length)]
-                            ))
-                        .ToArray();
-                    return forecast;
-                })
-                .WithName("GetWeatherForecast")
-                .WithOpenApi()
-                .RequireAuthorization();
+            endpoints.MapControllers();
         });
     }
-}
-
-public record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
 }
