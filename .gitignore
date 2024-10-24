@@ -16,3 +16,7 @@ Catalog/Catalog.Infrastructure/obj/
 Catalog/Catalog.Domain/bin/
 
 Catalog/Catalog.Domain/obj/
+
+Pricing.API/bin/
+
+Pricing.API/obj/
